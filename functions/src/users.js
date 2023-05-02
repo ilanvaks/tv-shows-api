@@ -1,5 +1,7 @@
 import { FieldValue } from "firebase-admin/firestore"
+import jwt from "jsonwebtoken"
 import { db } from "./dbConnect.js"
+import { secretKey } from "../secrets.js"
 
 const collection = db.collection("users")
 
@@ -20,7 +22,6 @@ export async function signup(req, res) {
   login(req, res)
 }
 
-
 export async function login(req, res) {
   const { email, password } = req.body
   if(!email || !password) {
@@ -37,6 +38,7 @@ export async function login(req, res) {
     return 
   }
   delete user.password
-  res.send(user) // { email, createdAt, id } should send an object with all those things
+  const token = jwt.sign(user, secretKey)
+  res.send({user, token}) // { email, createdAt, id } should send an object with all those things
 }
 
